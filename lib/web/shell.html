@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <title>Jake's Video Game</title>
+
+    <meta name="title" content="Jake's Video Game">
+    <meta name="description" content="This is a video made by Jake">
+    <meta name="keywords" content="raylib, games, html5, programming, C, C++, library, learn, videogames">
+    <meta name="viewport" content="width=device-width">
+
+    <!-- Open Graph metatags for sharing -->
+    <meta property="og:title" content="Jake's Video Game">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image" content="https://www.raylib.com/common/img/raylib_logo.png">
+    <meta property="og:site_name" content="jake.comay.ca">
+    <meta property="og:url" content="jake.comay.ca">
+    <meta property="og:description" content="This is a video made by Jake">
+
+    <!-- Twitter metatags for sharing -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@raysan5">
+    <meta name="twitter:title" content="raylib web game">
+    <meta name="twitter:image" content="https://www.raylib.com/common/raylib_logo.png">
+    <meta name="twitter:url" content="jake.comay.ca">
+    <meta name="twitter:description" content="This is a video made by Jake">
+
+    <!-- Links -->
+    <link rel="shortcut icon" href="https://www.raylib.com/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+
+    <!-- Styles -->
+    <style>
+        :root {
+            --light: rgb(42, 50, 70);
+            --dark: rgb(7, 18, 33);
+            --white: rgb(187, 187, 187);
+            --dark-blue: rgb(12, 26, 46);
+            --light-blue: rgb(23, 38, 58);
+
+            --width: 1280px;
+            --height: 800px;
+        }
+
+        * {
+            color: var(--white);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        div.emscripten {
+            text-align: center;
+        }
+        
+        /* NOTE: Canvas *must not* have any border or padding, or mouse coords will be wrong */
+        canvas.emscripten {
+            border: 0px none;
+            background: black;
+            width: var(--width);
+            height: auto;
+            max-width: 100%;
+        }
+
+        @media screen and (min-width: 1600px) {
+            canvas.emscripten {
+                width: var(--width);
+                height: var(--height);
+            }
+        }
+
+        .section {
+            position: relative;
+            border-radius: 6px;
+            background-color: var(--dark);
+            padding: 1.5rem;
+            padding-top: .8rem;
+
+            margin: 3rem 10rem 0 10rem;
+        }
+
+        .game {
+            padding-top: 1.5em;
+            display: flex;
+            justify-content: center;
+        }
+
+        :not(:root):fullscreen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        #status {
+            font-size: 2em;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            font-family: 'Source Code Pro', monospace;
+
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: right;
+            margin: 1.5rem 10rem;
+            gap: 1.5em;
+            font-weight: bold;
+        }
+
+        .buttons div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--dark);
+            font-size: 1.4em;
+            padding: 12px;
+            gap: 12px;
+            user-select: none;
+            cursor: pointer;
+            transition: 300ms;
+        }
+
+        .buttons div:hover {
+            background-color: rgb(14, 31, 55);
+        }
+
+        .buttons span {
+            scale: 1.3;
+        }
+
+        .highscores {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+
+        .highscores p {
+            font-weight: bold;
+        }
+
+        .highscores > table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: .5rem;
+        }
+        
+        .highscores > table tr {
+            background-color: var(--dark-blue)
+        }
+        
+        .highscores > table tr:first-child {
+            background-color: var(--light-blue)
+        }
+
+        .highscores > table td, th {
+            text-align: left;
+            padding: 8px;
+        }
+
+        h1 {
+            margin: 0 0 1rem 0;
+        }
+
+        .input-area {
+            font-size: 1.2rem;
+            background-color: var(--light-blue);
+            padding: 8px;
+            font-weight: bold;
+            border: 2px solid var(--light);
+        }
+
+        .input-area input {
+            background-color: transparent;
+            border: none;
+            font-size: inherit;
+            width: 100%;
+        }
+
+        .input-area:has(>input:focus) {
+            border-color: rgb(65, 74, 96);
+        }
+        
+        textarea:focus, input:focus, canvas:focus {
+            outline: 0;
+        }
+        
+        #output {
+            display: block;
+            width: 100%;
+            height: 256px;
+            font-size: 1.1em;
+            background-color: var(--light-blue);
+            font-family: 'Source Code Pro', monospace;
+            resize: none;
+            border: none;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: var(--light-blue)
+        }
+
+        ::-webkit-scrollbar {
+            background-color: var(--light-blue)
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: rgb(134, 139, 152);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgb(159, 159, 168);
+        }
+
+        ::-webkit-scrollbar-thumb:active {
+            background-color: var(--white);
+        }
+
+        .footer {
+            margin-top: 6rem;
+            width: 100%;
+            background-color: var(--dark);
+            padding: 16px 0;
+        }
+
+        .footer p {
+            margin: 0;
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        @media screen and (max-width: 1500px) {
+            body {
+                font-size: 90%;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Content -->
+    <div class="content">
+
+        <!-- Game -->
+        <div class="game section">
+            <div class="emscripten" id="status">Downloading...</div>
+            <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+        </div>
+
+        <!-- Buttons -->
+        <div class="buttons">
+            <div onclick="Module.requestFullscreen(false, false)">
+                <span class="material-symbols-outlined">fullscreen</span>Fullscreen
+            </div>
+
+            <div onclick="toggleAudio()" id="audio-off" style="display: none;">
+                <span class="material-symbols-outlined">volume_off</span>Audio
+            </div>
+
+            <div onclick="toggleAudio()" id="audio-on">
+                <span class="material-symbols-outlined">volume_up</span>Audio
+            </div>
+
+        </div>
+
+        <!-- Highscores -->
+        <div class="section highscores">
+            <h1>Highscores</h1>
+
+            <table id="highscore-table">
+                <tr>
+                    <th>Position</th>
+                    <th>Name</th>
+                    <th>Score</th>
+                </tr>
+                <tr>
+                    <td>Loading...</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <p id="other-submissions" style="display: none;"></p>
+        </div>
+        
+        <!-- Name -->
+        <div class="section username-input">
+            <h1>Name</h1>
+
+            <div class="input-area">
+                <input type="text" name="username" id="username" maxlength="50" >
+            </div>
+        </div>
+        
+        <!-- Console -->
+        <div class="section console">
+            <h1>Console</h1>
+            
+            <textarea id="output" rows="16" disabled></textarea>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Jake Games Co.</p>
+    </div>
+
+    <!-- File Saver -->
+    <script type='text/javascript' src="https://cdn.jsdelivr.net/gh/eligrey/FileSaver.js/dist/FileSaver.min.js"></script>
+    
+    <!-- Blob Octet-Stream -->
+    <script type='text/javascript'>
+        function saveFileFromMEMFSToDisk(memoryFSname, localFSname) // This can be called by C/C++ code
+        {
+            var isSafari = false;
+            var data = FS.readFile(memoryFSname);
+            var blob;
+
+            if (isSafari) blob = new Blob([data.buffer], { type: "application/octet-stream" });
+            else blob = new Blob([data.buffer], { type: "application/octet-binary" });
+            saveAs(blob, localFSname);
+        }
+    </script>
+    
+    <!-- Module -->
+    <script type='text/javascript'>
+        var statusElement = document.querySelector('#status');
+        var Module = {
+            preRun: [],
+            postRun: [],
+            print: (function () {
+                var element = document.querySelector('#output');
+
+                if (element) element.value = '';  // Clear browser cache
+
+                return function (text) {
+                    if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+                    console.log(text);
+
+                    if (element) {
+                        element.value += text + "\n";
+                        element.scrollTop = element.scrollHeight;  // Focus on bottom
+                    }
+                };
+            })(),
+
+            printErr: function (text) {
+                if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+
+                console.error(text);
+            },
+
+            canvas: (function () {
+                var canvas = document.querySelector('#canvas');
+                canvas.addEventListener("webglcontextlost", function (e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+                return canvas;
+            })(),
+
+            setStatus: function (text) {
+                if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+                if (text === Module.setStatus.last.text) return;
+
+                var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+                var now = Date.now();
+
+                if (m && now - Module.setStatus.last.time < 30) return; // If this is a progress update, skip it if too soon
+
+                Module.setStatus.last.time = now;
+                Module.setStatus.last.text = text;
+
+                statusElement.innerHTML = text;
+            },
+            totalDependencies: 0,
+            monitorRunDependencies: function (left) {
+                this.totalDependencies = Math.max(this.totalDependencies, left);
+                Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+            },
+        };
+
+        Module.setStatus('Downloading...');
+
+        window.onerror = function () {
+            Module.setStatus('Exception thrown, see JavaScript console');
+            Module.setStatus = function (text) { if (text) Module.printErr('[post-exception status] ' + text); };
+        };
+
+    </script>
+
+    <!-- Audio -->
+    <script type='text/javascript'>
+        var audioOn = document.querySelector('#audio-off');
+        var audioOff = document.querySelector('#audio-on');
+
+        // An array of all contexts to resume on the page
+        const audioContexList = [];
+        (function () {
+            // A proxy object to intercept AudioContexts and
+            // add them to the array for tracking and resuming later
+            self.AudioContext = new Proxy(self.AudioContext, {
+                construct(target, args) {
+                    const result = new target(...args);
+                    audioContexList.push(result);
+                    if (result.state == "suspended") {
+                        audioOff.style.display = "none";
+                        audioOn.style.display = "flex";
+                    };
+                    return result;
+                }
+            });
+        })();
+
+        function toggleAudio() {
+            var resumed = false;
+            audioContexList.forEach(ctx => {
+                if (ctx.state == "suspended") { ctx.resume(); resumed = true; }
+                else if (ctx.state == "running") ctx.suspend();
+            });
+
+            if (resumed) {
+                audioOff.style.display = "flex";
+                audioOn.style.display = "none";
+            } else {
+                audioOff.style.display = "none";
+                audioOn.style.display = "flex";
+            }
+        }
+    </script>
+    
+    <!-- Site -->
+    <script type='text/javascript'>
+        const highscores = document.getElementById("highscore-table")
+        const userNameInput = document.getElementById("username");
+        const otherSubsText = document.getElementById("other-submissions");
+
+        var lastData = {};
+
+        // I definately did not need this and no one is going to see it
+        function modifiedBubbleSort(arr, n) {
+            var i, j;
+            for (i = 0; i < n-1; i++) {
+                for (j = 0; j < n-i-1; j++) {
+                    if (arr[j]["score"] < arr[j+1]["score"]) {
+                        let tmp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = tmp;
+                    }
+                }
+            }
+            return arr;
+        }
+
+        // I miss React
+        function createHighscoreRow(pos, name, score) {
+            var row = document.createElement("tr");
+            var posTd = document.createElement("td");
+            posTd.innerText = pos;
+            row.appendChild(posTd)
+            var nameTd = document.createElement("td");
+            nameTd.innerText = name;
+            row.appendChild(nameTd)
+            var scoreTd = document.createElement("td");
+            scoreTd.innerText = score.toString();
+            row.appendChild(scoreTd)
+
+            return row;
+        }
+        
+        
+        // Get data from flask api
+        function updateHighscores(firstUpdate=false) {
+            fetch("https://waf1le.pythonanywhere.com/get")
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.toString() === lastData.toString() && !firstUpdate) return;
+                    
+                    lastData = data;
+                    otherSubsText.style.display = "none";
+                    tbodyElement = highscores.firstElementChild;
+                    
+                    for (var index = tbodyElement.children.length - 1; index > 0; index--) {
+                        tbodyElement.removeChild(tbodyElement.children[index]);
+                    }
+                    
+                    if (!data.length) {
+                        highscores.appendChild(createHighscoreRow("No submited scores yet", "", ""))
+                        return;
+
+                    } else {
+                        data = modifiedBubbleSort(data, data.length)
+                        for (var index = 0; index < data.length; index++) {
+                            let posIndex = index + 1;
+                            
+                            if (posIndex > 10) {
+                                if (data.length - 10 == 1) {
+                                    otherSubsText.innerText = `${data.length - 10} other submission - Imagine not making top 10 lmao :P LLL`;
+                                } else {
+                                    otherSubsText.innerText = `${data.length - 10} other submissions - Imagine not making top 10 lmao :P LLL`;
+                                }
+                                otherSubsText.style.display = "initial";
+                                break;
+                            }
+
+                            var pos;
+                            if (posIndex % 10 == 1) {
+                                pos = `${posIndex}st`
+                            } else if (posIndex % 10 == 2) {
+                                pos = `${posIndex}nd`
+                            } else if (posIndex % 10 == 3) {
+                                pos = `${posIndex}rd`
+                            } else {
+                                pos = `${posIndex}th`
+                            }
+                            tbodyElement.appendChild(createHighscoreRow(pos, data[index]["name"], data[index]["score"].toString()))
+                        }
+                    }
+            });
+        }
+
+        function submitNewScore(score) {
+            fetch(`https://waf1le.pythonanywhere.com/add/?name=${userNameInput.value}&score=${score}`)
+                .then(() => console.log("Sucessfully updated score"))
+        }
+
+        updateHighscores(true)
+        setInterval(updateHighscores, 3 * 1000);
+        
+        var defaultUserName = `Guest User ${Math.floor(Math.random() * 1000)}`;
+        userNameInput.value = defaultUserName
+        userNameInput.addEventListener("blur", () => {
+            if (userNameInput.value == "") {
+                userNameInput.value = defaultUserName;
+            }
+        })
+
+        userNameInput.addEventListener("keydown", event => {
+            if (event.key == "Backspace") {
+                event.preventDefault();
+                let text = userNameInput.value;
+                let caretStart = userNameInput.selectionStart;
+                let caretEnd = userNameInput.selectionEnd;
+
+                if (caretStart === caretEnd) {
+                    userNameInput.value = text.slice(0, caretStart - 1) + text.slice(caretStart, text.length);
+                    userNameInput.setSelectionRange(caretStart - 1, caretStart - 1)
+                } else {
+                    userNameInput.value = text.slice(0, caretStart) + text.slice(caretEnd, text.length);
+                    userNameInput.setSelectionRange(caretStart, caretStart)
+                }
+
+            }
+        })
+    </script>
+    
+    <!-- Game Code -->
+    {{{ SCRIPT }}}
+
+</body>
+
+</html>
